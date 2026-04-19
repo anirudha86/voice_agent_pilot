@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Medical Voice - Local AI Agent for Doctors</title>
+    <meta name="description" content="A premium, local-first voice dictation agent for healthcare professionals. Dictate patient history, symptoms, and more with Canary-Qwen.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">A</div>
+                <div class="logo-text">Aura<span>Medical</span></div>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" id="btn-new-dictation">
+                    <span class="icon">➕</span> New Dictation
+                </button>
+                <button class="nav-item" id="btn-history">
+                    <span class="icon">📁</span> Past Reports
+                </button>
+                <button class="nav-item" id="btn-settings">
+                    <span class="icon">⚙️</span> Settings
+                </button>
+            </nav>
+            <div class="model-status">
+                <div class="status-indicator online"></div>
+                <div class="status-info">
+                    <p class="status-label">Local Engine</p>
+                    <p class="status-model">Canary-Qwen 2.5B</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1>Patient Consultation Agent</h1>
+                <div class="header-actions">
+                    <button id="btn-generate-pdf" class="btn-primary" disabled>
+                        <span>📄</span> Generate PDF
+                    </button>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Recording Section -->
+                <section class="recording-card glass">
+                    <div class="visualizer-container">
+                        <canvas id="audio-visualizer"></canvas>
+                        <div class="timer" id="recording-timer">00:00</div>
+                    </div>
+                    <div class="dictation-status" id="dictation-status">Ready to listen...</div>
+                    <div class="controls">
+                        <button id="btn-record" class="record-button">
+                            <div class="mic-icon"></div>
+                        </button>
+                    </div>
+                    <div class="upload-area">
+                        <p>OR</p>
+                        <label for="audio-upload" class="upload-label">
+                            <span>📂</span> Upload Medical Audio File
+                            <input type="file" id="audio-upload" accept="audio/*" hidden>
+                        </label>
+                    </div>
+                    <div class="transcription-preview">
+                        <h3>Live Transcription</h3>
+                        <div id="live-transcript" class="transcript-box" contenteditable="true" placeholder="Transcription will appear here..."></div>
+                        <div class="transcript-actions">
+                            <button id="btn-process" class="btn-secondary" disabled>✨ Process into Report</button>
+                            <button id="btn-clear" class="btn-tertiary">🗑️ Clear</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Structured Report Section -->
+                <section class="report-card glass">
+                    <div class="report-header">
+                        <h2>Patient Report</h2>
+                        <div class="report-badges">
+                            <span class="badge draft">Draft</span>
+                        </div>
+                    </div>
+                    <div class="report-sections">
+                        <div class="report-group">
+                            <label for="history">Patient History</label>
+                            <textarea id="history" placeholder="Auto-populated history..."></textarea>
+                        </div>
+                        <div class="report-group">
+                            <label for="symptoms">Symptoms</label>
+                            <textarea id="symptoms" placeholder="Symptoms mentioned..."></textarea>
+                        </div>
+                        <div class="report-group">
+                            <label for="remedies">Remedies / Diagnosis</label>
+                            <textarea id="remedies" placeholder="Current diagnosis..."></textarea>
+                        </div>
+                        <div class="report-group">
+                            <label for="medications">Medications</label>
+                            <textarea id="medications" placeholder="Prescribed medications..."></textarea>
+                        </div>
+                        <div class="report-group">
+                            <label for="outcome">Outcome</label>
+                            <textarea id="outcome" placeholder="Expected outcome..."></textarea>
+                        </div>
+                        <div class="report-group">
+                            <label for="next_steps">Next Steps</label>
+                            <textarea id="next_steps" placeholder="Follow-up instructions..."></textarea>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
