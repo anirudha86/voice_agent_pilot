@@ -3,9 +3,9 @@ from faster_whisper import WhisperModel
 import tempfile
 
 class ASRManager:
-    def __init__(self, model_size="small"):
+    def __init__(self, model_size="medium"):
         # Using faster-whisper for maximum performance and speed
-        # This uses the official pretrained 'small' model
+        # This uses the official pretrained 'medium' model
         print(f"Loading Pretrained Faster-Whisper Model: {model_size}")
         self.model = WhisperModel(model_size, device="cpu", compute_type="int8")
 

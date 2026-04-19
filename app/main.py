@@ -14,9 +14,14 @@ warnings.simplefilter('ignore')
 # Suppress SSL/urllib3 warnings on macOS
 warnings.filterwarnings("ignore", category=UserWarning, module="urllib3")
 
-from app.asr_utils import asr_manager
-from app.llm_utils import llm_manager
-from app.pdf_utils import generate_medical_report
+try:
+    from app.asr_utils import asr_manager
+    from app.llm_utils import llm_manager
+    from app.pdf_utils import generate_medical_report
+except (ImportError, ModuleNotFoundError):
+    from asr_utils import asr_manager
+    from llm_utils import llm_manager
+    from pdf_utils import generate_medical_report
 
 app = FastAPI()
 
