@@ -11,3 +11,5 @@ huggingface_hub
 numpy
 pillow
 urllib3<2.0.0
+Cython
+nemo_toolkit[asr]

@@ -1,0 +1,8 @@
+Starting test...
+ASRManager imported successfully.
+Parakeet model loaded successfully!
+Testing transcription with file: temp_audio/dictation_20260420_093928_ed18.wav
+Raw transcription result type: <class 'tuple'>
+Raw transcription result: ([''], [''])
+Result is a tuple of length 2
+First element: ['']

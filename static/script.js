@@ -5,6 +5,11 @@ class VoiceAgent {
         this.isRecording = false;
         this.timerInterval = null;
         this.seconds = 0;
+        this.liveInterval = null;
+        this.lastTranscript = '';
+        this.isProcessingLive = false;
+        this.speechRecognition = null;
+        this.completedText = '';
         
         // DOM Elements
         this.btnRecord = document.getElementById('btn-record');
@@ -43,6 +48,11 @@ class VoiceAgent {
         this.resizeCanvas();
     }
 
+    getSelectedEngine() {
+        const selected = document.querySelector('input[name="asr-engine"]:checked');
+        return selected ? selected.value : 'whisper';
+    }
+
     async handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -52,6 +62,7 @@ class VoiceAgent {
 
         const formData = new FormData();
         formData.append('audio', file);
+        formData.append('engine', this.getSelectedEngine());
 
         try {
             const response = await fetch('/api/transcribe', {
@@ -86,6 +97,9 @@ class VoiceAgent {
     }
 
     async startRecording() {
+        this.completedText = this.liveTranscript.textContent.trim();
+        this.lastTranscript = '';
+        
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             this.mediaRecorder = new MediaRecorder(stream);
@@ -106,6 +120,7 @@ class VoiceAgent {
             this.statusDisplay.textContent = 'Recording...';
             this.startTimer();
             this.startVisualizer(stream);
+            this.startWebSpeech();
             this.notify('Recording started...', 'info');
         } catch (err) {
             console.error('Error accessing microphone:', err);
@@ -120,9 +135,37 @@ class VoiceAgent {
             this.btnRecord.classList.remove('recording');
             this.statusDisplay.textContent = 'Paused';
             this.stopTimer();
+            if (this.speechRecognition) this.speechRecognition.stop();
             this.btnProcess.disabled = false;
         }
     }
+
+    startWebSpeech() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return;
+
+        this.speechRecognition = new SpeechRecognition();
+        this.speechRecognition.continuous = true;
+        this.speechRecognition.interimResults = true;
+        this.speechRecognition.lang = 'en-US';
+
+        this.speechRecognition.onresult = (event) => {
+            let interimTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    this.lastTranscript += event.results[i][0].transcript + ' ';
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+            // Update UI instantly with rough draft, maintaining previous session text
+            const separator = this.completedText ? ' ' : '';
+            this.liveTranscript.textContent = this.completedText + separator + this.lastTranscript + interimTranscript;
+        };
+
+        this.speechRecognition.start();
+    }
+
 
     async handleRecordingStop() {
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
@@ -131,6 +174,7 @@ class VoiceAgent {
         // Send to backend for transcription
         const formData = new FormData();
         formData.append('audio', audioBlob);
+        formData.append('engine', this.getSelectedEngine());
 
         try {
             const response = await fetch('/api/transcribe', {
@@ -140,7 +184,8 @@ class VoiceAgent {
             const data = await response.json();
             
             if (data.text) {
-                this.liveTranscript.textContent += (this.liveTranscript.textContent ? ' ' : '') + data.text;
+                const separator = this.completedText ? ' ' : '';
+                this.liveTranscript.textContent = this.completedText + separator + data.text;
                 this.statusDisplay.textContent = 'Ready for next dictation';
                 this.notify('Transcription complete', 'success');
             }
@@ -216,6 +261,8 @@ class VoiceAgent {
 
     clearTranscript() {
         this.liveTranscript.textContent = '';
+        this.lastTranscript = '';
+        this.completedText = '';
         this.btnProcess.disabled = true;
         this.btnGeneratePdf.disabled = true;
         for (let key in this.reportFields) {

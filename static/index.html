@@ -57,6 +57,22 @@
                         <div class="timer" id="recording-timer">00:00</div>
                     </div>
                     <div class="dictation-status" id="dictation-status">Ready to listen...</div>
+                    <div class="engine-selector">
+                        <label class="engine-option">
+                            <input type="radio" name="asr-engine" value="whisper" checked>
+                            <div class="engine-pill">
+                                <span class="engine-icon">🌬️</span>
+                                <span class="engine-name">Whisper</span>
+                            </div>
+                        </label>
+                        <label class="engine-option">
+                            <input type="radio" name="asr-engine" value="parakeet">
+                            <div class="engine-pill">
+                                <span class="engine-icon">🦜</span>
+                                <span class="engine-name">Parakeet</span>
+                            </div>
+                        </label>
+                    </div>
                     <div class="controls">
                         <button id="btn-record" class="record-button">
                             <div class="mic-icon"></div>

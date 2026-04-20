@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Body
+from fastapi import FastAPI, UploadFile, File, Body, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import uvicorn
@@ -30,17 +30,20 @@ os.makedirs("temp_audio", exist_ok=True)
 os.makedirs("reports", exist_ok=True)
 
 @app.post("/api/transcribe")
-async def transcribe_audio(audio: UploadFile = File(...)):
-    temp_path = f"temp_audio/{uuid.uuid4()}.wav"
+async def transcribe_audio(audio: UploadFile = File(...), engine: str = Form("whisper")):
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    temp_path = f"temp_audio/dictation_{timestamp}_{uuid.uuid4().hex[:4]}.wav"
+    
     with open(temp_path, "wb") as buffer:
         shutil.copyfileobj(audio.file, buffer)
     
     try:
-        text = asr_manager.transcribe(temp_path)
-        return {"text": text}
-    finally:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
+        text = asr_manager.transcribe(temp_path, engine=engine)
+        return {"text": text, "saved_at": temp_path}
+    except Exception as e:
+        print(f"Transcription error: {e}")
+        return {"error": str(e)}
 
 @app.post("/api/structure")
 async def structure_content(payload: Dict = Body(...)):
